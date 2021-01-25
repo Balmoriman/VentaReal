@@ -65,6 +65,7 @@ namespace WSVenta
                 }; 
             }); 
             services.AddScoped<IUserService, UserService>(); // inyeccion de interface 
+            services.AddScoped<IVentaService, VentaService>(); // inyeccion de dependencias 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
