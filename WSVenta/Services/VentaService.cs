@@ -21,7 +21,7 @@ namespace WSVenta.Services
                         try
                         {
                             var venta = new Venta();
-                            venta.Total = model.Conceptos.Sum(s => s.Cantidad * s.PrecioUnitario);
+                            venta.Total = model.Conceptos.Sum(s => s.Cantidad * s.Importe);
                             venta.Fecha = DateTime.Now;
                             venta.IdCliente = model.IdCliente;
                             db.Venta.Add(venta);

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WSVenta.Models.Common;
 using WSVenta.Services;
+using WSVenta.Tools;
 
 namespace WSVenta
 {
@@ -36,12 +37,19 @@ namespace WSVenta
             {
                 Options.AddPolicy(name: MiCors, builder =>
                 {
-                    builder.WithHeaders("*"); 
+                    builder.WithHeaders("*");
                     builder.WithOrigins("*"); //define seguirdad del sitio
-                    builder.WithMethods("*"); 
+                    builder.WithMethods("*");
                 });
             });
-            services.AddControllers();
+
+            //para la conversion en el modulo de venta
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new IntToStringConverter());
+                options.JsonSerializerOptions.Converters.Add(new DecimalToStringConverter());
+
+            });
             // se supone que se va utilizar jasonwebtoken para la autenticacion de usuario...continuara 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
@@ -53,7 +61,8 @@ namespace WSVenta
             {
                 a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 a.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(d=> {
+            }).AddJwtBearer(d =>
+            {
                 d.RequireHttpsMetadata = false;
                 d.SaveToken = true;
                 d.TokenValidationParameters = new TokenValidationParameters
@@ -62,8 +71,8 @@ namespace WSVenta
                     IssuerSigningKey = new SymmetricSecurityKey(llave),//atributo que tiene el secreto 
                     ValidateIssuer = false,
                     ValidateAudience = false
-                }; 
-            }); 
+                };
+            });
             services.AddScoped<IUserService, UserService>(); // inyeccion de interface 
             services.AddScoped<IVentaService, VentaService>(); // inyeccion de dependencias 
         }
